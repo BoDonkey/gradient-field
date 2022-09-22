@@ -30,7 +30,7 @@
             
           </div>
           <footer class="apos-link-control__footer">
-            <AposButton type="button" label="+" :disabled="addLimit" @click="addColor" />
+            <AposButton type="button" label="+" @click="addColor" />
           </footer>
         </div>
       </div>
