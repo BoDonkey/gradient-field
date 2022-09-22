@@ -12,13 +12,25 @@
           <div id="color-square" :style="{ background: gradient }" />
           <div>
             <AposSchema
-            :schema="schema" v-model="schemaInput" :trigger-validation="triggerValidation"
+            :schema="rangeSchema" v-model="schemaInput"
+            :trigger-validation="triggerValidation"
             :utility-rail="false" :generation="generation"
             />
+            <ul>
+              <li v-for="color in colors">
+                <AposButton type="button" label="up" :icon="arrow-up-icon" :icon-only="true" :disabled="atEdge" @click="moveUp" />
+                <AposButton type="button" label="down" :icon="arrow-down-icon" :icon-only="true" :disabled="atEdge" @click="moveDown" />
+                <AposSchema
+                :schema="schema" v-model="schemaInput"
+                :trigger-validation="triggerValidation"
+                :utility-rail="false" :generation="generation" />
+                <AposButton type="button" label="-" :icon="delete-icon" :icon-only="true" :disabled="removeLimit" @click="removeColor" />
+              </li>
+            </ul>
+            
           </div>
           <footer class="apos-link-control__footer">
             <AposButton type="button" label="+" :disabled="addLimit" @click="addColor" />
-            <AposButton type="button" label="-" :disabled="removeLimit" @click="removeColor" />
           </footer>
         </div>
       </div>
@@ -49,7 +61,21 @@ export default {
     const next = this.getNext();
     const parsedSchema = this.parseSchema(next);
     return {
-      schema: parsedSchema,
+      rangeSchema: {
+          name: 'gradientangle',
+          label: 'Gradient Angle',
+          type: 'range',
+          min: 0,
+          max: 360,
+          unit: 'deg'
+      },
+      schema: [
+        {
+        name: 'color',
+        label: 'Color',
+        type: 'color'
+        }
+      ],
       schemaInput: {
         data: next
       },
@@ -66,18 +92,6 @@ export default {
       });
       colorString = colorString + ')';
       return colorString;
-    },
-    addLimit() {
-      if (this.schema.length === 10) {
-        return true;
-      }
-      return false;
-    },
-    removeLimit() {
-      if (this.schema.length < 3) {
-        return true;
-      }
-      return false;
     }
   },
   watch: {
@@ -100,68 +114,25 @@ export default {
     getNext() {
       return this.value ? this.value.data : (this.field.def || {});
     },
-    parseSchema(next) {
-      const defaultSchema = [
-        {
-          name: 'gradientangle',
-          label: 'Gradient Angle',
-          type: 'range',
-          min: 0,
-          max: 360,
-          unit: 'deg'
-        },
-        {
-          name: 'colorone',
-          label: 'Color One',
-          type: 'color'
-        },
-        {
-          name: 'colortwo',
-          label: 'Color Two',
-          type: 'color'
-        }
-      ];
-      if (Object.keys(next).length < 4) {
-        return defaultSchema;
-      } else {
-        const returnedSchema = [];
-        for (const [key, value] of Object.entries(next)) {
-          if (key === 'gradientangle') {
-            const field = {
-              name: 'gradientangle',
-              label: 'Gradient Angle',
-              type: 'range',
-              min: 0,
-              max: 360,
-              unit: 'deg'
-            };
-            returnedSchema.push(field);
-          } else {
-            let number = key.split('color')[1];
-            number = number.charAt(0).toUpperCase() + number.slice(1);
-            let field = {
-              name: key,
-              label: `Color ${number}`,
-              type: 'color'
-            };
-            returnedSchema.push(field);
-          };
-        }
-        return returnedSchema;
-      }
-    },
     addColor() {
-      const fieldNumbers = [ 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten' ];
-      const currentField = this.schema.length;
-      const newSchema = {
-        name: `color${fieldNumbers[currentField].toLowerCase()}`,
-        label: `Color ${fieldNumbers[currentField]}`,
-        type: 'color'
-      };
-      this.schema.push(newSchema);
+      this.schemaInput.data.push({color: "#0047abff"});
     },
     removeColor() {
-      this.schema.pop();
+      console.log('figure out how to remove');
+    },
+    moveUp() {
+      console.log('figure out how to move up');
+    },
+    moveDown() {
+      console.log('figure out how to move down');
+    },
+    atEdge() {
+      console.log('figure out how to see beginning or end');
+      return false;
+    },
+    removeLimit() {
+      // TBD
+      return false;
     }
   }
 };
