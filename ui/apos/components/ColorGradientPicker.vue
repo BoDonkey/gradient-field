@@ -60,14 +60,16 @@ export default {
   data() {
     const next = this.getNext();
     return {
-      rangeSchema: {
+      rangeSchema: [
+        {
           name: 'gradientangle',
           label: 'Gradient Angle',
           type: 'range',
           min: 0,
           max: 360,
           unit: 'deg'
-      },
+      }
+    ],
       schema: [
         {
         name: 'color',
