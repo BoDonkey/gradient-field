@@ -59,7 +59,6 @@ export default {
   },
   data() {
     const next = this.getNext();
-    const parsedSchema = this.parseSchema(next);
     return {
       rangeSchema: {
           name: 'gradientangle',
