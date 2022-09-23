@@ -17,7 +17,7 @@
             :utility-rail="false" :generation="generation"
             />
             <ul>
-              <li v-for="color in colors">
+              <li v-for="color in colorInput">
                 <AposButton type="button" label="up" :icon="arrow-up-icon" :icon-only="true" :disabled="atEdge" @click="moveUp" />
                 <AposButton type="button" label="down" :icon="arrow-down-icon" :icon-only="true" :disabled="atEdge" @click="moveDown" />
                 <AposSchema
