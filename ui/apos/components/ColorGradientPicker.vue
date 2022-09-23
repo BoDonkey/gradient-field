@@ -12,7 +12,7 @@
           <div id="color-square" :style="{ background: gradient }" />
           <div>
             <AposSchema
-            :schema="rangeSchema" v-model="schemaInput"
+            :schema="rangeSchema" v-model="rangeInput"
             :trigger-validation="triggerValidation"
             :utility-rail="false" :generation="generation"
             />
@@ -21,7 +21,7 @@
                 <AposButton type="button" label="up" :icon="arrow-up-icon" :icon-only="true" :disabled="atEdge" @click="moveUp" />
                 <AposButton type="button" label="down" :icon="arrow-down-icon" :icon-only="true" :disabled="atEdge" @click="moveDown" />
                 <AposSchema
-                :schema="schema" v-model="schemaInput"
+                :schema="colorSchema" v-model="colorInput"
                 :trigger-validation="triggerValidation"
                 :utility-rail="false" :generation="generation" />
                 <AposButton type="button" label="-" :icon="delete-icon" :icon-only="true" :disabled="removeLimit" @click="removeColor" />
@@ -58,7 +58,8 @@ export default {
     }
   },
   data() {
-    const next = this.getNext();
+    const nextColor = this.getNext(color);
+    const nextRange = this.getNext(range);
     return {
       rangeSchema: [
         {
@@ -70,22 +71,26 @@ export default {
           unit: 'deg'
       }
     ],
-      schema: [
+      colorSchema: [
         {
         name: 'color',
         label: 'Color',
         type: 'color'
         }
       ],
-      schemaInput: {
-        data: next
+      colorInput: {
+        data: nextColor
       },
-      next
+      nextColor,
+      rangeInput: {
+        data: nextRange
+      },
+      nextRange
     };
   },
   computed: {
     gradient() {
-      const _data = { ...this.schemaInput.data };
+      const _data = { ...this.colorInput.data, ...this.rangeInput.data };
       let colorString = `linear-gradient(${_data.gradientangle}deg`;
       delete _data.gradientangle;
       Object.values(_data).forEach(value => {
@@ -96,27 +101,34 @@ export default {
     }
   },
   watch: {
-    schemaInput() {
-      this.next = this.schemaInput.data;
+    colorInput() {
+      this.nextColor = this.colorInput.data;
+    },
+    rangeInput() {
+      this.nextRange = this.rangeInput.data;
     },
     generation() {
-      this.next = this.getNext();
-      this.schemaInput = {
-        data: this.next
+      this.nextColor = this.getNext(color);
+      this.colorInput = {
+        data: this.nextColor
+      };
+      this.nextRange = this.getNext(range);
+      this.rangeInput = {
+        data: this.nextRange
       };
     }
   },
   methods: {
     validate(value) {
-      if (this.schemaInput.hasErrors) {
+      if (this.colorInput.hasErrors || this.rangeInput.hasErrors) {
         return 'invalid';
       }
     },
-    getNext() {
+    getNext(type) {
       return this.value ? this.value.data : (this.field.def || {});
     },
     addColor() {
-      this.schemaInput.data.push({color: "#0047abff"});
+      this.colorInput.data.push({color: "#0047abff"});
     },
     removeColor() {
       console.log('figure out how to remove');
