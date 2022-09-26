@@ -19,34 +19,8 @@ module.exports = {
       },
       async convert(req, field, data, object) {
         const input = data[field.name];
-
-        // Check it is the right type of data
-        if (typeof input !== 'object') {
-          throw self.apos.error('Data object is malformed');
-        }
-
-        // Check if required and present
-        if (
-          field.required &&
-          (_.isUndefined(input) || Object.keys(input).length < 3)
-        ) {
-          throw self.apos.error('required');
-        };
-
-        // Make sure each value is a valid
-        for (const [key, value] of Object.entries(input)) {
-          if (key === 'gradientangle') {
-            if (!Number.isInteger(value) || value > 360 || value < 0) {
-              throw self.apos.error('Improper range value');
-            }
-          } else {
-            const test = tinycolor(value);
-            if (!tinycolor(test).isValid()) {
-              throw self.apos.error('Not a color string');
-            }
-          }
-        };
-
+        console.log('in convert input', input);
+        // Write validation when figure out final data structure
         object[field.name] = input;
       },
       makeGradient(colorData) {

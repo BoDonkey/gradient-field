@@ -5,6 +5,7 @@
     :uid="uid"
     :display-options="displayOptions"
     :modifiers="modifiers"
+    :value="value"
   >
     <template #body>
       <div class="apos-input-object">
@@ -12,13 +13,20 @@
           <div id="color-square" :style="{ background: gradient }" />
           <div>
             <AposSchema
-            :schema="schema" v-model="schemaInput" :trigger-validation="triggerValidation"
+            :schema="initialColorsSchema" v-model="colorsSchemaInput"
+            :trigger-validation="triggerValidation"
+            :utility-rail="false" :generation="generation"
+            />
+          </div>
+          <div>
+            <AposSchema
+            :schema="extraColorSchema" v-model="colorsSchemaInput"
+            :trigger-validation="triggerValidation"
             :utility-rail="false" :generation="generation"
             />
           </div>
           <footer class="apos-link-control__footer">
             <AposButton type="button" label="+" :disabled="addLimit" @click="addColor" />
-            <AposButton type="button" label="-" :disabled="removeLimit" @click="removeColor" />
           </footer>
         </div>
       </div>
@@ -34,7 +42,7 @@ export default {
   name: 'ColorGradientPicker',
   components: {
     AposInputWrapper
-  },
+},
   mixins: [ AposInputMixin ],
   props: {
     generation: {
@@ -47,10 +55,12 @@ export default {
   },
   data() {
     const next = this.getNext();
-    const parsedSchema = this.parseSchema(next);
+    const parsedSchema = this.parseSchema();
+    const colorSchema = this.colorSchema();
     return {
-      schema: parsedSchema,
-      schemaInput: {
+      initialColorsSchema: parsedSchema,
+      extraColorSchema: colorSchema,
+      colorsSchemaInput: {
         data: next
       },
       next
@@ -58,110 +68,74 @@ export default {
   },
   computed: {
     gradient() {
-      const _data = { ...this.schemaInput.data };
-      let colorString = `linear-gradient(${_data.gradientangle}deg`;
-      delete _data.gradientangle;
-      Object.values(_data).forEach(value => {
-        colorString = `${colorString}, ${value}`;
-      });
-      colorString = colorString + ')';
-      return colorString;
+      // holder until final data structure
+      return 'linear-gradient(45deg, "#ff0000ff", "#00FF00FF", "#0000ffff")';
     },
+
     addLimit() {
-      if (this.schema.length === 10) {
-        return true;
-      }
-      return false;
-    },
-    removeLimit() {
-      if (this.schema.length < 3) {
-        return true;
-      }
+      // holder till I figure this out
+      console.log('tbd');
       return false;
     }
   },
   watch: {
-    schemaInput() {
-      this.next = this.schemaInput.data;
+    colorsSchemaInput() {
+      // No idea how to impliment this
+      // Tried to move color into a colors array
+      // but then how do I repopulate each field
+      this.next = {
+        ...this.next,
+        ...this.colorsSchemaInput.data
+      };
     },
     generation() {
       this.next = this.getNext();
-      this.schemaInput = {
+      this.colorsSchemaInput = {
         data: this.next
       };
     }
   },
   methods: {
     validate(value) {
-      if (this.schemaInput.hasErrors) {
+      if (this.colorsSchemaInput.hasErrors)
+      {
         return 'invalid';
       }
     },
     getNext() {
-      return this.value ? this.value.data : (this.field.def || {});
+      return this.value.data ? this.value.data : (this.field.def || {});
     },
-    parseSchema(next) {
+    parseSchema() {
       const defaultSchema = [
         {
-          name: 'gradientangle',
+          name: 'angle',
           label: 'Gradient Angle',
           type: 'range',
           min: 0,
           max: 360,
-          unit: 'deg'
+          step: 1,
+          unit: 'deg',
+          def: 90
         },
         {
-          name: 'colorone',
-          label: 'Color One',
+          name: 'color',
           type: 'color'
         },
+      ];
+      return defaultSchema;
+    },
+    colorSchema() {
+      const returnedSchema = [
         {
-          name: 'colortwo',
-          label: 'Color Two',
+          name: 'color',
           type: 'color'
         }
       ];
-      if (Object.keys(next).length < 4) {
-        return defaultSchema;
-      } else {
-        const returnedSchema = [];
-        for (const [key, value] of Object.entries(next)) {
-          if (key === 'gradientangle') {
-            const field = {
-              name: 'gradientangle',
-              label: 'Gradient Angle',
-              type: 'range',
-              min: 0,
-              max: 360,
-              unit: 'deg'
-            };
-            returnedSchema.push(field);
-          } else {
-            let number = key.split('color')[1];
-            number = number.charAt(0).toUpperCase() + number.slice(1);
-            let field = {
-              name: key,
-              label: `Color ${number}`,
-              type: 'color'
-            };
-            returnedSchema.push(field);
-          };
-        }
-        return returnedSchema;
-      }
+      return returnedSchema;
     },
     addColor() {
-      const fieldNumbers = [ 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten' ];
-      const currentField = this.schema.length;
-      const newSchema = {
-        name: `color${fieldNumbers[currentField].toLowerCase()}`,
-        label: `Color ${fieldNumbers[currentField]}`,
-        type: 'color'
-      };
-      this.schema.push(newSchema);
-    },
-    removeColor() {
-      this.schema.pop();
+      // How do I add an extra AposSchema?
+      console.log('tbd');
     }
   }
 };
