@@ -12,18 +12,21 @@
         <div class="apos-input-wrapper">
           <div id="color-square" :style="{ background: gradient }" />
           <div>
-            <AposSchema
-            :schema="initialColorsSchema" v-model="colorsSchemaInput"
-            :trigger-validation="triggerValidation"
-            :utility-rail="false" :generation="generation"
+            <AposInputRange
+            :field="{
+              name: 'angle',
+              label: 'Gradient Angle',
+            }"
+            :value="next.angle"
+            @change="gradientChange"
             />
-          </div>
+            </div>
           <div>
-            <AposSchema
+            <!-- <AposSchema
             :schema="extraColorSchema" v-model="colorsSchemaInput"
             :trigger-validation="triggerValidation"
             :utility-rail="false" :generation="generation"
-            />
+            /> -->
           </div>
           <footer class="apos-link-control__footer">
             <AposButton type="button" label="+" :disabled="addLimit" @click="addColor" />
@@ -55,11 +58,7 @@ export default {
   },
   data() {
     const next = this.getNext();
-    const parsedSchema = this.parseSchema();
-    const colorSchema = this.colorSchema();
     return {
-      initialColorsSchema: parsedSchema,
-      extraColorSchema: colorSchema,
       colorsSchemaInput: {
         data: next
       },
@@ -71,7 +70,6 @@ export default {
       // holder until final data structure
       return 'linear-gradient(45deg, "#ff0000ff", "#00FF00FF", "#0000ffff")';
     },
-
     addLimit() {
       // holder till I figure this out
       console.log('tbd');
@@ -79,15 +77,6 @@ export default {
     }
   },
   watch: {
-    colorsSchemaInput() {
-      // No idea how to impliment this
-      // Tried to move color into a colors array
-      // but then how do I repopulate each field
-      this.next = {
-        ...this.next,
-        ...this.colorsSchemaInput.data
-      };
-    },
     generation() {
       this.next = this.getNext();
       this.colorsSchemaInput = {
@@ -103,7 +92,7 @@ export default {
       }
     },
     getNext() {
-      return this.value.data ? this.value.data : (this.field.def || {});
+      return this?.value.data ? this.value.data : (this.field.def || {});
     },
     parseSchema() {
       const defaultSchema = [
@@ -136,6 +125,11 @@ export default {
     addColor() {
       // How do I add an extra AposSchema?
       console.log('tbd');
+    },
+    gradientChange() {
+      this.error = this.value.error;
+      console.log('gradient error', this.error);
+      this.next.angle = this.data;
     }
   }
 };
