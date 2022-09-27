@@ -9,21 +9,25 @@
     <template #body>
       <div class="apos-input-object">
         <div class="apos-input-wrapper">
-          <div id="color-square" :style="{ background: gradient }" />
+          <!-- <div id="color-square" :style="{ background: gradient }" /> -->
           <div>
-            <AposSchema
+            <!-- <AposSchema
             :schema="rangeSchema" v-model="rangeInput"
             :trigger-validation="triggerValidation"
             :utility-rail="false" :generation="generation"
-            />
+            /> -->
+            <AposInputRange :value="next.angle" :field="next.angle.field" />
             <ul>
-              <li v-for="color in colorInput">
+              <li v-for="color in next.colors" :key="color">
                 <AposButton type="button" label="up" :icon="arrow-up-icon" :icon-only="true" :disabled="atEdge" @click="moveUp" />
                 <AposButton type="button" label="down" :icon="arrow-down-icon" :icon-only="true" :disabled="atEdge" @click="moveDown" />
-                <AposSchema
+                <AposInputColor 
+                  :value="color"
+                />
+                <!-- <AposSchema
                 :schema="colorSchema" v-model="colorInput"
                 :trigger-validation="triggerValidation"
-                :utility-rail="false" :generation="generation" />
+                :utility-rail="false" :generation="generation" /> -->
                 <AposButton type="button" label="-" :icon="delete-icon" :icon-only="true" :disabled="removeLimit" @click="removeColor" />
               </li>
             </ul>
@@ -42,6 +46,18 @@
 import AposInputMixin from 'Modules/@apostrophecms/schema/mixins/AposInputMixin';
 import AposInputWrapper from 'Modules/@apostrophecms/schema/components/AposInputWrapper.vue';
 
+/**
+ * value: {
+ *  angle: {
+ *    field: Object
+ *  }
+ *  colors: [
+ *    String, String, { field: Object }
+ *  ]
+ * }
+ * 
+ */
+
 export default {
   name: 'ColorGradientPicker',
   components: {
@@ -58,47 +74,52 @@ export default {
     }
   },
   data() {
-    const nextColor = this.getNext(color);
-    const nextRange = this.getNext(range);
+    const next = this.getNext()
+    // const colors = value.colors; // array of colors
+    // const angle = value.angle // gradient angle
+
+    // const nextColor = this.getNext(color);
+    // const nextRange = this.getNext(range);
     return {
-      rangeSchema: [
-        {
-          name: 'gradientangle',
-          label: 'Gradient Angle',
-          type: 'range',
-          min: 0,
-          max: 360,
-          unit: 'deg'
-      }
-    ],
-      colorSchema: [
-        {
-        name: 'color',
-        label: 'Color',
-        type: 'color'
-        }
-      ],
-      colorInput: {
-        data: nextColor
-      },
-      nextColor,
-      rangeInput: {
-        data: nextRange
-      },
-      nextRange
+      next
+    //   rangeSchema: [
+    //     {
+    //       name: 'gradientangle',
+    //       label: 'Gradient Angle',
+    //       type: 'range',
+    //       min: 0,
+    //       max: 360,
+    //       unit: 'deg'
+    //   }
+    // ],
+      // colorSchema: [
+      //   {
+      //   name: 'color',
+      //   label: 'Color',
+      //   type: 'color'
+      //   }
+      // ],
+      // colorInput: {
+      //   data: nextColor
+      // },
+      // nextColor,
+      // rangeInput: {
+      //   data: nextRange
+      // },
+      // nextRange
     };
   },
   computed: {
-    gradient() {
-      const _data = { ...this.colorInput.data, ...this.rangeInput.data };
-      let colorString = `linear-gradient(${_data.gradientangle}deg`;
-      delete _data.gradientangle;
-      Object.values(_data).forEach(value => {
-        colorString = `${colorString}, ${value}`;
-      });
-      colorString = colorString + ')';
-      return colorString;
-    }
+    // gradient() {
+    //   const _data = { ...this.colorInput.data, ...this.rangeInput.data };
+    //   let colorString = `linear-gradient(${_data.gradientangle}deg`;
+    //   delete _data.gradientangle;
+    //   Object.values(_data).forEach(value => {
+    //     colorString = `${colorString}, ${value}`;
+    //   });
+    //   colorString = colorString + ')';
+    //   return colorString;
+    // }
   },
   watch: {
     colorInput() {
@@ -125,8 +146,22 @@ export default {
       }
     },
     getNext(type) {
-      console.log(this.value.data);
-      return this.value ? this.value.data : (this.field.def || {});
+      // console.log(this.value.data);
+      // console.log(this.value);
+      return {
+        angle: {
+          field: {
+            step: 1,
+            min: 0,
+            value: 80
+          }
+        },
+        color: ['#ffee00']
+      }
+      // return this?.value.data ? this.value.data : (this.field.def || {
+      //   angle: 70,
+      //   colors: ['#ff00ee', '#00ee33']
+      // });
     },
     addColor() {
       this.colorInput.data.push({color: "#0047abff"});
