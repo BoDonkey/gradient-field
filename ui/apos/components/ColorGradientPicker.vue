@@ -17,7 +17,7 @@
               name: 'angle',
               label: 'Gradient Angle',
             }"
-            :value="next.angle"
+            :value="value"
             @change="gradientChange"
             />
             </div>
