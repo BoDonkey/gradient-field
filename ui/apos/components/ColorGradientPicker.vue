@@ -19,20 +19,25 @@
             <ul>
               <h3>Colors</h3>
               <li v-for="(color, index) in colors">
+                <!-- This <p> is just temporary for debugging-->
                 <p>{{ color }}</p>
                 <AposSchema :schema="colorSchema" v-model="colorsValue" :trigger-validation="triggerValidation"
                 :utility-rail="false" :generation="generation"
                 :key="index" />
-                <AposButton
-                :field="{
-                  label: 'Trash'
-                }"
-                />
+                <div>
+                  <span>
+                <button @click="moveUp" :disabled="atLimit">Up</button>
+                <button @click="moveDown" :disabled="atLimit">Down</button>
+                </span>
+                <span class="span-right">
+                  <button @click="removeColor">Trash</button>
+                </span>
+                </div>
               </li>
             </ul>
           </div>
           <footer class="apos-link-control__footer">
-            <AposButton type="button" label="+" :disabled="addLimit" @click="addColor" />
+            <AposButton type="button" label="+" @click="addColor" />
           </footer>
         </div>
       </div>
@@ -64,7 +69,6 @@ export default {
   },
   data() {
     const next = this.getNext();
-    console.log('next in data', next);
     return {
       colorSchema: [
         {
@@ -87,9 +91,9 @@ export default {
       // holder until final data structure
       return 'linear-gradient(45deg, #e66465, #9198e5)';
     },
-    addLimit() {
-      // holder till I figure out if this is needed
-      console.log('tbd');
+    atLimit() {
+      // disable buttons for the top or the bottom - need multiple functions?
+      console.log('TBD');
       return false;
     }
   },
@@ -103,7 +107,7 @@ export default {
     colorsValue() {
       const newColorArray = this.setColorArray();
       const colorsLength = this.next.colorsLength;
-      // spreading both next and colorvalue to get the error checking and validation from colorvalue
+      // spreading colorValue additionally to get error checking
       this.next = {
         ...this.next,
         ...this.colorValue,
@@ -123,14 +127,12 @@ export default {
       return false;
     },
     getNext() {
-      // not sure default colors array is correct
       return this.value.data ? this.value.data : (this.field.def || {
         angle: 90,
         colors: [
           { data: {color: '#4a90e2ff'}}
         ],
         colorsLength: 1
-        // ranValidation: true
       });
     },
     setColorArray() {
@@ -138,6 +140,7 @@ export default {
       const newColorObject = {data:newColor};
       let newArray = [...this.next.colors];
       newArray.pop();
+      // returning the array with push didn't work, but...
       newArray.push(newColorObject);
       return newArray
     },
@@ -153,6 +156,18 @@ export default {
     addColor() {
       this.next.colors.push({data: {color: '#00ff00ff'}});
       this.next.colorsLength++;
+    },
+    moveUp() {
+      // need to pass a key and rearrange colors array? or...?
+      console.log('TBD');
+    },
+    moveDown() {
+      // need to pass a key and rearrange colors array? or...?
+      console.log('TBD');
+    },
+    removeColor() {
+      // need to pass a key and delete from array? or...?
+      console.log('TBD');
     }
   }
 };
@@ -178,5 +193,9 @@ li {
 
 .apos-input-object ::v-deep .apos-schema .apos-field {
   margin-bottom: 30px;
+}
+
+.span-right {
+  float: right;
 }
 </style>
