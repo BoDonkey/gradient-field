@@ -36,6 +36,12 @@
               </li>
             </ul>
           </div>
+          <div>
+            <AposSchema
+            :schema="schematwo" v-model="schemaInput" :trigger-validation="triggerValidation"
+            :utility-rail="false" :generation="generation"
+            />
+          </div>
           <footer class="apos-link-control__footer">
             <AposButton type="button" label="+" @click="addColor" />
           </footer>
@@ -69,6 +75,7 @@ export default {
   },
   data() {
     const next = this.getNext();
+
     return {
       colorSchema: [
         {
@@ -88,6 +95,7 @@ export default {
   },
   computed: {
     gradient() {
+
       // holder until final data structure
       return 'linear-gradient(45deg, #e66465, #9198e5)';
     },
@@ -134,6 +142,7 @@ export default {
         ],
         colorsLength: 1
       });
+
     },
     setColorArray() {
       const newColor = this.colorsValue.data;
