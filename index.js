@@ -20,18 +20,21 @@ module.exports = {
       async convert(req, field, data, object) {
         const input = data[field.name];
         console.log('in convert input', input);
+
         // Write validation when figure out final data structure
+
         object[field.name] = input;
       },
       makeGradient(colorData) {
-        const _data = {...colorData};
-        let colorString = `linear-gradient(${_data.gradientangle}deg`;
-        delete _data.gradientangle;
-        Object.values(_data).forEach((values) => {
-          colorString = `${colorString}, ${value}`;
-        });
-        colorString = colorString + ')';
-        return colorString;
+        //Possibly rewrite or find a different way when final data structure decided
+        // const _data = {...colorData};
+        // let colorString = `linear-gradient(${_data.gradientangle}deg`;
+        // delete _data.gradientangle;
+        // Object.values(_data).forEach((values) => {
+        //   colorString = `${colorString}, ${value}`;
+        // });
+        // colorString = colorString + ')';
+        // return colorString;
       }
     };
   }
