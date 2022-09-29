@@ -26,11 +26,11 @@
                 :key="index" />
                 <div>
                   <span>
-                <button @click="moveUp" :disabled="atLimit">Up</button>
-                <button @click="moveDown" :disabled="atLimit">Down</button>
+                <button @click="moveUp(index)" :disabled="atLimit">Up</button>
+                <button @click="moveDown(index)" :disabled="atLimit">Down</button>
                 </span>
                 <span class="span-right">
-                  <button @click="removeColor">Trash</button>
+                  <button @click="removeColor(index)">Trash</button>
                 </span>
                 </div>
               </li>
@@ -157,17 +157,20 @@ export default {
       this.next.colors.push({data: {color: '#00ff00ff'}});
       this.next.colorsLength++;
     },
-    moveUp() {
+    moveUp(index) {
+      // need to pass a key and rearrange colors array? or...?
+      console.log('TBD');;
+      console.log('index', index)
+    },
+    moveDown(index) {
       // need to pass a key and rearrange colors array? or...?
       console.log('TBD');
+      console.log('index', index);
     },
-    moveDown() {
-      // need to pass a key and rearrange colors array? or...?
-      console.log('TBD');
-    },
-    removeColor() {
+    removeColor(index) {
       // need to pass a key and delete from array? or...?
       console.log('TBD');
+      console.log('index', index);
     }
   }
 };
