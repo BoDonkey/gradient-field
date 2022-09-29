@@ -17,9 +17,17 @@
           </div>
           <div>
             <ul>
+              <h3>Colors</h3>
               <li v-for="(color, index) in colors">
-                <AposSchema :schema="extraColorSchema" v-model="colorValue" :trigger-validation="triggerValidation"
-                  :utility-rail="false" :generation="generation" :key="index" />
+                <p>{{ color }}</p>
+                <AposSchema :schema="colorSchema" v-model="colorsValue" :trigger-validation="triggerValidation"
+                :utility-rail="false" :generation="generation"
+                :key="index" />
+                <AposButton
+                :field="{
+                  label: 'Trash'
+                }"
+                />
               </li>
             </ul>
           </div>
@@ -36,12 +44,14 @@
 
 import AposInputMixin from 'Modules/@apostrophecms/schema/mixins/AposInputMixin';
 import AposInputWrapper from 'Modules/@apostrophecms/schema/components/AposInputWrapper.vue';
+import AposButton from 'apostrophe/modules/@apostrophecms/ui/ui/apos/components/AposButton.vue';
 
 export default {
   name: 'ColorGradientPicker',
   components: {
-    AposInputWrapper
-  },
+    AposInputWrapper,
+    AposButton
+},
   mixins: [AposInputMixin],
   props: {
     generation: {
@@ -54,59 +64,56 @@ export default {
   },
   data() {
     const next = this.getNext();
-    const colorSchema = this.getColorSchema();
-    const colorsLength = next.colors.length;
-    console.log('in data', colorsLength);
     console.log('next in data', next);
     return {
-      extraColorSchema: colorSchema,
-      colorValue: {
-        data: next
+      colorSchema: [
+        {
+          name: 'color',
+          type: 'color'
+        }
+      ],
+      colorsValue: {
+        data: next.colors
       },
       angleValue: {
         data: next.angle
       },
       next,
-      colors: next.colors,
-      colorsLength: colorsLength
+      colors: next.colors
     };
   },
   computed: {
     gradient() {
       // holder until final data structure
-      return 'linear-gradient(45deg, "#ff0000ff", "#00FF00FF", "#0000ffff")';
+      return 'linear-gradient(45deg, #e66465, #9198e5)';
     },
     addLimit() {
-      // holder till I figure this out
+      // holder till I figure out if this is needed
       console.log('tbd');
       return false;
     }
   },
   watch: {
     angleValue() {
-      console.log('in angle value', this.angleValue, this.next);
       this.next = {
         ...this.next,
-        ...this.angleValue,
         angle: this.angleValue.data
       }
     },
-    colorValue() {
-      console.log('in color picker', this.colorValue, this.next);
+    colorsValue() {
       const newColorArray = this.setColorArray();
-      const colorsLength = newColorArray.length;
-      console.log('in colorValue', typeof newColorArray, newColorArray,);
+      const colorsLength = this.next.colorsLength;
+      // spreading both next and colorvalue to get the error checking and validation from colorvalue
       this.next = {
         ...this.next,
         ...this.colorValue,
-        color: this.colorValue.data.color,
         colors: newColorArray,
         colorsLength: colorsLength
       }
     },
     generation() {
       this.next = this.getNext();
-      this.colorsSchemaInput = {
+      this.colorsValue = {
         data: this.next
       };
     }
@@ -116,53 +123,23 @@ export default {
       return false;
     },
     getNext() {
-      console.log('in getNext', this.value.data);
+      // not sure default colors array is correct
       return this.value.data ? this.value.data : (this.field.def || {
         angle: 90,
-        color: '#4a90e2ff',
-        colors: ['#4a90e2ff'],
-        ranValidation: true
+        colors: [
+          { data: {color: '#4a90e2ff'}}
+        ],
+        colorsLength: 1
+        // ranValidation: true
       });
     },
-    getAngleValue() {
-      console.log('in getAngleValue');
-      return this?.value.angle ? this.value.angle : (this.field.def || 90);
-    },
     setColorArray() {
-      console.log('in setColorArray length',this.colorsLength);
-      // Return new color if we are changing the first color
-      if (this.colorsLength === 1){
-        return  [ this.colorValue.data.color ];
-      };
-
-      let colorArray = this.next.colors;
-      console.log('in set color array', typeof colorArray, colorArray);
-
-      // Return changed array if we are changing in place
-      if (colorArray.length === this.colorsLength) {
-        return colorArray[colorArray.length - 1] = this.colorValue.data.color;
-      } else {
-        return colorArray.push(this.colorValue.data.color);
-      }
-    },
-    parseSchema() {
-      const defaultSchema = [
-        {
-          name: 'angle',
-          label: 'Gradient Angle',
-          type: 'range',
-          min: 0,
-          max: 360,
-          step: 1,
-          unit: 'deg',
-          def: 90
-        },
-        {
-          name: 'color',
-          type: 'color'
-        },
-      ];
-      return defaultSchema;
+      const newColor = this.colorsValue.data;
+      const newColorObject = {data:newColor};
+      let newArray = [...this.next.colors];
+      newArray.pop();
+      newArray.push(newColorObject);
+      return newArray
     },
     getColorSchema() {
       const returnedSchema = [
@@ -174,17 +151,8 @@ export default {
       return returnedSchema;
     },
     addColor() {
-      // How do I add an extra AposSchema?
-      console.log('prepush', this.next, this.colorsLength);
-      let newColorArray = [...this.next.colors];
-      newColorArray.push("#00ff00ff");
-
-      console.log('in plus', this.next.colors);
-    },
-    angleChange() {
-      this.error = this.value.error;
-      console.log('angle error', this.error);
-      this.next.angle = this.data;
+      this.next.colors.push({data: {color: '#00ff00ff'}});
+      this.next.colorsLength++;
     }
   }
 };
