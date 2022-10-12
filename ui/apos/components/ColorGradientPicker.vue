@@ -8,10 +8,10 @@
           <div>
             <AposSchema
               :schema="angleSchema"
+              v-model="angleSchemaInput"
               :trigger-validation="triggerValidation"
               :utility-rail="false"
               :generation="generation"
-              v-model="angleSchemaInput"
               ref="schema"
             />
           </div>
@@ -28,11 +28,11 @@
                 />
                 <div>
                   <span>
-                    <button @click="moveUp(color.id)" :disabled="disableMoveUp(color.id)">Up</button>
-                    <button @click="moveDown(color.id)" :disabled="disableMoveDown(color.id)">Down</button>
+                    <AposButton type="button" lable="Up" @click="moveUp(color.id)" :disabled="disableMoveUp(color.id)" />
+                    <AposButton type="button" lable="Down" @click="moveDown(color.id)" :disabled="disableMoveDown(color.id)" />
                   </span>
                   <span class="span-right">
-                    <button @click="remove(color.id)">Trash</button>
+                    <AposButton type="button" lable="Trash" @click="remove(color.id)" />
                   </span>
                 </div>
               </li>
@@ -55,6 +55,7 @@ import AposButton from 'apostrophe/modules/@apostrophecms/ui/ui/apos/components/
 import cuid from 'cuid';
 
 const defColor = '#4a90e2ff';
+const defPercentage = '50%';
 
 export default {
   name: 'ColorGradientPicker',
@@ -96,8 +97,17 @@ export default {
           label: 'Color',
           type: 'color',
           def: defColor
+        },
+        {
+          name: 'percentage',
+          lable: 'Percentage',
+          type: 'range',
+          min: 0,
+          max: 100,
+          unit: '%',
+          def: defPercentage
         }
-      ],
+      ]
     };
   },
   computed: {
@@ -155,21 +165,8 @@ export default {
     getNext() {
       return this.value.data ? this.value.data : (this.field.def || {
         angle: 90,
-        colors: [ defColor ]
+        colors: [ {defColor, defPercentage} ]
       });
-    },
-    setColorArray() {
-      const newColor = this.colorsValue.data;
-      const newColorObject = {data:newColor};
-      let newArray = [...this.next.colors];
-      newArray.pop();
-      // returning the array with push didn't work, but...
-      newArray.push(newColorObject);
-      return newArray
-    },
-    addColor() {
-      this.next.colors.push({data: {color: '#00ff00ff'}});
-      this.next.colorsLength++;
     },
     disableMoveUp(id) {
       const index = this.colors.findIndex(color => color.id === id);
@@ -208,7 +205,8 @@ export default {
         id: cuid(),
         schemaInput: {
           data: {
-            color: defColor
+            color: defColor,
+            percentage: defPercentage
           }
         },
       });
@@ -225,11 +223,14 @@ function expandAngle(angle) {
 }
 
 function expandColors(colors) {
+  console.log('in wxpandColors');
+  console.log('colors', colors);
   return colors.map(color => ({
     id: cuid(),
     schemaInput: {
       data: {
-        color
+        color,
+        percentage
       }
     }
   }));
