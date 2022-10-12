@@ -10,6 +10,7 @@ module.exports = {
   methods(self) {
     return {
       addVueGradientPickerFieldType() {
+        console.log('in field type *********************************************');
         self.apos.schema.addFieldType({
           name: 'gradientPicker',
           convert: self.convert,
@@ -41,16 +42,22 @@ module.exports = {
           throw self.apos.error('invalid', 'colors is not an array');
         }
         result.colors = input.colors.map(value => {
-          const test = tinycolor(value);
+          const test = tinycolor(value.color);
           if (!tinycolor(test).isValid()) {
             throw self.apos.error('Not a color string');
+          }
+          if(!Number.isInteger(value.percentage) || value.percentage > 100 || value.percentage < 0) {
+            throw self.apos.error('invalid', 'color percentage has an invalid value');
           }
           return value;
         });
         object[field.name] = result;
       },
       makeGradient(value) {
-        return `linear-gradient(${value.angle}deg, ${value.colors.join(', ')})`;
+        const theColors = value.colors;
+        let colorArray = theColors.map(color => color.color);
+
+        return `linear-gradient(${value.angle}deg, ${colorArray.join(', ')})`;
       }
     };
   }
