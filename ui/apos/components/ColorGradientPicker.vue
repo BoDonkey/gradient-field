@@ -20,7 +20,7 @@
               <h3>Colors</h3>
               <li v-for="color in colors" v-bind:key="color.id">
                 <AposSchema
-                  :schema="colorSchema"
+                  :schema="colorInputSchema"
                   v-model="color.schemaInput"
                   :trigger-validation="triggerValidation"
                   :utility-rail="false"
@@ -90,7 +90,7 @@ export default {
           unit: 'deg'
         }
       ],
-      colorSchema: [
+      colorInputSchema: [
         {
           name: 'color',
           label: 'Color',
@@ -157,19 +157,6 @@ export default {
         angle: 90,
         colors: [ defColor ]
       });
-    },
-    setColorArray() {
-      const newColor = this.colorsValue.data;
-      const newColorObject = {data:newColor};
-      let newArray = [...this.next.colors];
-      newArray.pop();
-      // returning the array with push didn't work, but...
-      newArray.push(newColorObject);
-      return newArray
-    },
-    addColor() {
-      this.next.colors.push({data: {color: '#00ff00ff'}});
-      this.next.colorsLength++;
     },
     disableMoveUp(id) {
       const index = this.colors.findIndex(color => color.id === id);
